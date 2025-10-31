@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Maior Surpresa</title>
+    <!-- Fonte Inter, moderna e limpa -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* CSS: Deep Pink Romance Theme */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Fundo muito claro com toque de rosa */
+            background-color: #fce4ec; 
+            color: #333;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+            padding: 40px;
+            background: #fff;
+            /* Sombra suave com o toque de rosa */
+            box-shadow: 0 10px 30px rgba(255, 64, 129, 0.25);
+            border-radius: 25px; /* Mais arredondado */
+            transition: transform 0.3s;
+        }
+
+        h1 {
+            color: #FF4081; /* Deep Pink: Cor de destaque */
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 900;
+        }
+
+        h2 {
+            color: #555;
+            font-size: 1.4em;
+        }
+
+        /* Seções Escondidas */
+        #love-meter-section, #quiz-section, #proposal-only, #accepted-section {
+            display: none;
+            padding: 20px 0;
+        }
+
+        /* Estilo para todos os botões primários */
+        #start-button, #yes-button {
+            padding: 15px 35px;
+            font-size: 1.1em;
+            font-weight: 700;
+            background-color: #FF4081; /* Deep Pink */
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 64, 129, 0.4);
+        }
+
+        #start-button:hover, #yes-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 64, 129, 0.6);
+            background-color: #E03774;
+        }
+        
+        /* Love Meter */
+        #love-meter {
+            width: 80%;
+            background-color: #ffcdd2; /* Rosa pálido */
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 25px auto;
+        }
+
+        #love-bar {
+            height: 35px;
+            width: 0%;
+            background-color: #FF80AB; /* Rosa suave de preenchimento */
+            transition: width 0.5s ease-out; /* Transição mais rápida */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Botões do Love Meter (Corações) */
+        .love-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .love-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            transition: transform 0.1s;
+        }
+
+        .love-button:active {
+            transform: scale(0.95);
+        }
+
+        .love-button svg {
+            width: 60px;
+            height: 60px;
+        }
+        
+        #broken-heart {
+            color: #f44336; /* Vermelho Erro */
+        }
+
+        #full-heart {
+            color: #FF4081; /* Deep Pink Sucesso */
+        }
+        /* Fim dos Botões do Love Meter */
+
+        /* Seção do Quiz */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 15px;
+            border: 2px solid #FFCDD2; /* Borda rosa muito clara */
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .option:hover {
+            background-color: #F8BBD0; /* Fundo mais claro no hover */
+            border-color: #FF4081;
+            transform: translateY(-1px);
+        }
+
+        .option.correct {
+            background-color: #C8E6C9; /* Verde sucesso */
+            border-color: #4CAF50;
+            pointer-events: none; 
+            font-weight: bold;
+        }
+
+        .option.incorrect {
+            background-color: #f8d7da; /* Rosa erro */
+            border-color: #dc3545;
+            /* No erro, o JS vai liberar o ponteiro para tentar novamente */
+        }
+
+        /* Contador de Tempo */
+        #countdown {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            padding: 15px;
+            background: #fffafa;
+            border-radius: 15px;
+            box-shadow: inset 0 0 8px rgba(255, 64, 129, 0.1);
+        }
+
+        .time-unit {
+            margin: 0 15px;
+            text-align: center;
+        }
+
+        .time-unit span {
+            display: block;
+            font-size: 2.5em;
+            color: #FF4081; /* Cor do Tempo */
+            line-height: 1.1;
+            font-weight: 900;
+        }
+
+        #proposal-box {
+            margin-top: 40px;
+            padding: 30px;
+            /* Borda principal Deep Pink */
+            border: 3px solid #FF4081; 
+            border-radius: 15px;
+            background: #fffafa; 
+        }
+        
+        /* Botão NÃO Fugitivo: Remove position: fixed; para que ele comece ao lado do SIM */
+        #no-button {
+            padding: 15px 30px;
+            font-size: 1.1em; /* Tamanho igual ao SIM */
+            font-weight: 700;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 12px; 
+            cursor: pointer;
+            transition: all 0.2s ease-out; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+            z-index: 9999; 
+            /* Quando ele fugir, o JS vai aplicar position: fixed e left/top */
+        }
+        
+        /* Ajusta o container dos botões para usar flexbox e ter espaço */
+        #button-area {
+            position: relative; 
+            height: 80px; 
+            display: flex; /* Garante que SIM e NÃO fiquem lado a lado */
+            justify-content: center; 
+            align-items: center;
+            gap: 20px; /* Espaço entre os botões */
+        }
+
+        /* NOVO: Wrapper para posicionar as setas */
+        #gallery-wrapper {
+            position: relative;
+            margin: 30px 0;
+            padding: 0 40px; /* Espaço para as setas não cobrirem a foto */
+        }
+
+        /* Estilo da Galeria de Fotos Arrastável (Carrossel) */
+        #photo-gallery {
+            /* MUDANÇA: removemos a margem que foi para o #gallery-wrapper */
+            margin: 0; 
+            display: flex;
+            /* Permite arrastar horizontalmente (scrolling) */
+            overflow-x: scroll; 
+            /* Para que o scroll seja mais suave */
+            scroll-behavior: smooth; 
+            /* Opcional: Efeito de 'snap' nas fotos */
+            scroll-snap-type: x mandatory; 
+            gap: 15px;
+            padding: 10px 0; /* Espaçamento interno */
+            /* Esconde a barra de rolagem no Webkit (Chrome/Safari) */
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        /* Esconde a barra de rolagem no Chrome/Safari */
+        #photo-gallery::-webkit-scrollbar {
+            display: none;
+        }
+        
+        #photo-gallery img {
+            /* Tamanho fixo para cada imagem no carrossel */
+            min-width: 250px; 
+            height: 250px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+            /* Efeito de 'snap' */
+            scroll-snap-align: start; 
+            transition: transform 0.2s;
+        }
+
+        #photo-gallery img:hover {
+            transform: scale(1.02);
+        }
+
+        /* NOVO: Estilo dos botões de navegação (Setas) */
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 64, 129, 0.8); /* Deep Pink Transparente */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, opacity 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-button:hover {
+            background-color: #FF4081; /* Deep Pink sólido no hover */
+        }
+
+        .nav-button.left {
+            left: 0;
+        }
+
+        .nav-button.right {
+            right: 0;
+        }
+
+        .nav-button svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Mídia query para responsividade em telas menores (celular/tablet) */
+        @media (max-width: 768px) {
+             #photo-gallery img {
+                /* Em telas menores, as imagens ficam um pouco maiores */
+                min-width: 80vw; 
+                height: 80vw;
+             }
+             /* NOVO: Esconde os botões no celular (onde o arraste funciona bem) */
+             .nav-button {
+                display: none;
+             }
+             /* Remove o padding do wrapper em mobile */
+            #gallery-wrapper {
+                padding: 0; 
+            }
+        }
+        
+        #final-message {
+            margin: 30px 0;
+            line-height: 1.7;
+            text-align: justify;
+            padding: 20px;
+            background: #fcfcfc;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- TAG DE MÚSICA -->
+<audio id="background-music" loop>
+    <!-- Prioriza o arquivo MP3 que você enviou -->
+    <source src="nossamusica.mp3" type="audio/mpeg" onerror="this.onerror=null;">
+    <!-- Mantém o MP4 como um fallback, caso você queira usar o vídeo (renomeado) -->
+    <source src="nossamusica.mp4" type="audio/mp4" onerror="this.onerror=null;">
+    Seu navegador não suporta a tag de áudio. (Verifique se o nome do arquivo de música está correto: nossamusica.mp3)
+</audio>
+<!-- FIM DA TAG DE MÚSICA -->
+
+
+<div class="container">
+
+    <!-- 1. Tela Inicial e Love Meter -->
+    <div id="intro-section" style="display: block;">
+        <h1>Olá, meu amor! Prepare-se para uma surpresa que o Juninho preparou para você 😉</h1>
+        <p>Eu estava programando algo muito especial para este dia. Clique abaixo para iniciar! (Obs: Lembre-se do <strong>fone</strong>!)</p>
+        <button id="start-button" onclick="startLoveMeter()">Sim, aceito!</button>
+    </div>
+
+    <div id="love-meter-section">
+        <h1>Quanto de "Oficial" tem o nosso amor?</h1>
+        <p>Clique no coração para encher a barra e liberar a próxima etapa!</p>
+        
+        <div id="love-meter">
+            <div id="love-bar">0%</div>
+        </div>
+        
+        <p id="love-text">0/10 cliques</p>
+
+        <div class="love-buttons">
+            <!-- Botão de Coração Partido (Para diminuir ou não fazer nada, apenas enfeite) -->
+            <button class="love-button" onclick="handleLoveClick(false)">
+                <!-- SVG de Coração Partido -->
+                <svg id="broken-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.622 17.51a3.02 3.02 0 0 1-5.185.08c-2.31-2.31-2.914-5.26-1.558-6.903a4.135 4.135 0 0 1 1.78-.962l.21.365a1.8 1.8 0 0 0 1.258.625l.89-.002a2.49 2.49 0 0 0 2.483-2.38V9.17c0-.23-.02-.457-.058-.682a3.02 3.02 0 0 1 4.545-3.076c1.693 1.233 2.112 3.12 1.096 4.606l-1.353 2.052c-.655.992-1.28 2.016-1.875 3.073L12.622 17.51zM20.24 4.76c-2.196-2.196-5.744-2.196-7.94 0l-1.071 1.07c-2.197-2.197-5.744-2.197-7.94 0-2.197 2.196-2.197 5.744 0 7.94l8.36 8.36c.18.18.424.283.674.283.25 0 .494-.103.674-.283l8.36-8.36c2.196-2.196 2.196-5.744 0-7.94z"/>
+                </svg>
+            </button>
+            
+            <!-- Botão de Coração (Para encher a barra) -->
+            <button class="love-button" onclick="handleLoveClick(true)" id="full-heart-button">
+                <!-- SVG de Coração Preenchido -->
+                <svg id="full-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. Quiz -->
+    <div id="quiz-section">
+        <h1>Teste de Casal: Você conhece a nossa história?</h1>
+        <p>Responda corretamente para provar que você é a única para mim!</p>
+
+        <div id="quiz-content">
+            <!-- As perguntas serão injetadas aqui pelo JavaScript -->
+        </div>
+
+        <h2 id="quiz-message" style="color: #4CAF50; display: none;">Parabéns! Você respondeu tudo certo!</h2>
+    </div>
+
+    <!-- 3. SEÇÃO SOMENTE DO PEDIDO E TEXTO EMOCIONAL -->
+    <div id="proposal-only">
+        
+        <h1>O Momento de Recalcular a Rota</h1>
+        
+        <div id="final-message">
+            <!-- *** ÁREA PARA SUA MENSAGEM FINAL (ATUALIZADA) *** -->
+            <p>
+                <strong>O Dia Que Mudou A Minha Vida</strong><br><br>
+                Hoje, 23 de novembro de 2025, eu fiz você passar por um teste, um medidor de amor. Isso porque, desde o dia em que eu te conheci, 19 de julho de 2025, eu venho percebendo o quanto a minha vida mudou e melhorou com você nela. O resultado sempre é 100%. Até quando a gente briga. Até quando você me tira a paciência. Só o fato de estar com você faz tudo valer a pena.<br><br>
+                Eu lembro perfeitamente do nosso primeiro dia juntos. Sei que não foi o mais fofo e romântico do mundo, mas foi e ainda é muito importante pra mim. Foi o bastante para virar minha vida do avesso e me mostrar que algo diferente tinha acontecido.<br><br>
+                Eu te amo de um jeito que nem sei explicar. Sou apaixonado por cada detalhe seu. Todo dia que eu acordo dá aquela vontade de te lembrar o quanto te amo e o quanto você é especial pra mim. Cada momento nosso é incrível. Até quando só estamos rindo feitos bobos, passa um filme na minha cabeça que me mostra que meu lugar é ao lado.<br><br>
+                Você é a minha paz, minha alegria, meu estresse. Você consegue alegrar meus dias com um simples sorriso. Cada momento nosso vale mais do que qualquer coisa. Você se tornou a pessoa mais importante da minha vida. Mesmo quando você acha besteira, eu sempre vou te lembrar disso.<br><br>
+                A gente ainda é jovem. Temos muito pra viver. Só que no dia em que eu me permiti te amar, eu fiz uma escolha para minha vida. Talvez a mais arriscada. Talvez a mais importante. Porque essa escolha te incluía nela. Escolhi que quero você para sempre. Quero construir nossa família, realizar sonhos, descobrir o mundo do seu lado. Pra sempre eu e você.<br><br>
+                Me desculpa por não ser um homem perfeito, me desculpa por errar, me desculpa se um dia eu já te magoei, eu juro que estou sempre tentando melhorar por mim e por nós. Você me faz querer melhorar todo dia, estou sempre tentando ser o homem perfeito pra você por que eu sei que você merece tudo que é bom.<br><br>
+                Talvez você não saiba o quanto você é incrível, a pessoa mais esforçada que eu conheço, e cada dia que passa eu te admiro cada vez mais, e me apaixono cada vez mais. Sempre vou estar mostrando pra você o seu valor! Sou sincero quando digo que te amo, sou sincero quando digo que tenho medo de te perder, por que hoje o mundo sem você não tem graça.<br><br>
+                Todas nossas memórias nesses 4 meses mostram o caminho que percorremos. Mas, a partir de agora, eu não quero mais contar o tempo apenas. Eu quero viver o tempo, sabendo que estamos construindo algo oficialmente. Eu preciso saber de você, da sua escolha, se você pensa do mesmo jeito que eu, se você quer a mesma coisa que eu, eu não quero ser só mais um.<br><br>
+                O contador de tempo não para. Só que a nossa história começa hoje. De verdade. Então olha com atenção para a pergunta abaixo…
+            </p>
+        </div>
+
+        <div id="proposal-box">
+            <!-- *** PERGUNTA DO PEDIDO *** -->
+            <h3 id="proposal-question">Quer namorar comigo? 💘✨</h3>
+            <!-- FRASES EXTRA MOVIMENTO PARA CÁ -->
+            <p style="font-size: 0.9em; margin-top: -10px; color: #FF4081; font-weight: bold;">
+                Se ama jesus é SIM, Se ama o diabo é NÃO
+            </p>
+            <div id="button-area" style="position: relative; height: 80px; display: flex; justify-content: center; align-items: center; gap: 20px;">
+                <button id="yes-button" onclick="acceptProposal()">SIM</button>
+                <!-- O botão 'NÃO' está AQUI dentro, e só foge no mouseover/touchstart -->
+                <button id="no-button" style="display: none;">NÃO</button> 
+            </div>
+        </div>
+    </div>
+    
+    <!-- 4. SEÇÃO DE ACEITE (CONTADOR + FOTOS) -->
+    <div id="accepted-section">
+        <h1>Nós, Oficialmente! (E Nossas Memórias)</h1>
+        
+        <h2>Contador de "Nós" Desde 19/07/2025</h2>
+        <div id="countdown">
+            <div class="time-unit"><span id="days">00</span>Dias</div>
+            <div class="time-unit"><span id="hours">00</span>Horas</div>
+            <div class="time-unit"><span id="minutes">00</span>Minutos</div>
+            <div class="time-unit"><span id="seconds">00</span>Segundos</div>
+        </div>
+
+        <h2>Nossas 27 Melhores Fotos (Arraste para o lado ou use as setas!)</h2>
+        <!-- INÍCIO DA GALERIA DE FOTOS (CARROSSEL ARRASTÁVEL) -->
+        <div id="gallery-wrapper"> <!-- NOVO: Wrapper para posicionar as setas -->
+            
+            <!-- Botão Esquerdo -->
+            <button class="nav-button left" onclick="scrollGallery(-1)">
+                <!-- SVG Left Arrow -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+            </button>
+
+            <div id="photo-gallery">
+                <!-- Fotos de 1 a 27 (Mantenha o nome exato dos seus arquivos!) -->
+                <img src="foto1.jpg" alt="Momento Nosso 1" onerror="this.onerror=null; this.src='https://placehold.co/250x250/FFCDD2/555?text=Foto+1'">
+                <img src="foto2.jpg" alt="Momento Nosso 2" onerror="this.onerror=null; this.src='https://placehold.co/250x250/F8BBD0/555?text=Foto+2'">
+                <img src="foto3.jpg" alt="Momento Nosso 3" onerror="this.onerror=null; this.src='https://placehold.co/250x250/E1BEE7/555?text=Foto+3'">
+                <img src="foto4.jpg" alt="Momento Nosso 4" onerror="this.onerror=null; this.src='https://placehold.co/250x250/FFCDD2/555?text=Foto+4'">
+                <img src="foto5.jpg" alt="Momento Nosso 5" onerror="this.onerror=null; this.src='https://placehold.co/250x250/F8BBD0/555?text=Foto+5'">
+                <img src="foto6.jpg" alt="Momento Nosso 6" onerror="this.onerror=null; this.src='https://placehold.co/250x250/E1BEE7/555?text=Foto+6'">
+                <img src="foto7.jpg" alt="Momento Nosso 7" onerror="this.onerror=null; this.src='https://placehold.co/250x250/FFCDD2/555?text=Foto+7'">
+                <img src="foto8.jpg" alt="Momento Nosso 8" onerror="this.onerror=null; this.src='https://placehold.co/250x250/F8BBD0/555?text=Foto+8'">
+                <img src="foto9.jpg" alt="Momento Nosso 9" onerror="this.onerror=null; this.src='https://placehold.co/250x250/E1BEE7/555?text=Foto+9'">
+                <img src="foto10.jpg" alt="Momento Nosso 10" onerror="this.onerror=null; this.src='https://placehold.co/250x250/FFCDD2/555?text=Foto+10'">
+                <img src="foto11.jpg" alt="Momento Nosso 11" onerror="this.onerror=null; this.src='https://placehold.co/250x250/F8BBD0/555?text=Foto+11'">
+                <img src="foto12.jpg" alt="Momento Nosso 12" onerror="this.onerror=null; this.src='https://placehold.co/250x250/E1BEE7/555?text=Foto+12'">
+                <img src="foto13.jpg" alt="Momento Nosso 13" onerror="this.onerror=null; this.src='https://placehold.co/250x250/FFCDD2/555?text=Foto+13'">
+                <img src="foto14.jpg" alt="Momento Nosso 14" onerror="this.onerror=null; this.src='https://placehold.co/250x250/F8BBD0/555?text=Foto+14'">
+                <img src="foto15.jpg" alt="Momento Nosso 15" onerror="this.onerror=null; this.src='https://placehold.co/250x250/E1BEE7/555?text=Foto+15'">
+                <img src="foto16.jpg" alt="Momento Nosso 16" onerror="this.onerror=null; this.src='https://placehold.co/250x250/FFCDD2/555?text=Foto+16'">
+                <img src="foto17.jpg" alt="Momento Nosso 17" onerror="this.onerror=null; this.src='https://placehold.co/250x250/F8BBD0/555?text=Foto+17'">
+                <img src="foto18.jpg" alt="Momento Nosso 18" onerror="this.onerror=null; this.src='https://placehold.co/250x250/E1BEE7/555?text=Foto+18'">
+                <img src="foto19.jpg" alt="Momento Nosso 19" onerror="this.onerror=null; this.src='https://placehold.co/250x250/FFCDD2/555?text=Foto+19'">
+                <img src="foto20.jpg" alt="Momento Nosso 20" onerror="this.onerror=null; this.src='https://placehold.co/250x250/F8BBD0/555?text=Foto+20'">
+                <img src="foto21.jpg" alt="Momento Nosso 21" onerror="this.onerror=null; this.src='https://placehold.co/250x250/E1BEE7/555?text=Foto+21'">
+                <img src="foto22.jpg" alt="Momento Nosso 22" onerror="this.onerror=null; this.src='https://placehold.co/250x250/FFCDD2/555?text=Foto+22'">
+                <img src="foto23.jpg" alt="Momento Nosso 23" onerror="this.onerror=null; this.src='https://placehold.co/250x250/F8BBD0/555?text=Foto+23'">
+                <img src="foto24.jpg" alt="Momento Nosso 24" onerror="this.onerror=null; this.src='https://placehold.co/250x250/E1BEE7/555?text=Foto+24'">
+                <img src="foto25.jpg" alt="Momento Nosso 25" onerror="this.onerror=null; this.src='https://placehold.co/250x250/FFCDD2/555?text=Foto+25'">
+                <img src="foto26.jpg" alt="Momento Nosso 26" onerror="this.onerror=null; this.src='https://placehold.co/250x250/F8BBD0/555?text=Foto+26'">
+                <img src="foto27.jpg" alt="Momento Nosso 27" onerror="this.onerror=null; this.src='https://placehold.co/250x250/E1BEE7/555?text=Foto+27'">
+            </div>
+            
+            <!-- Botão Direito -->
+            <button class="nav-button right" onclick="scrollGallery(1)">
+                <!-- SVG Right Arrow -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </button>
+        </div>
+        <!-- FIM DA GALERIA DE FOTOS -->
+        
+        <!-- MENSAGEM FINAL CORRIGIDA -->
+        <p style="margin-top: 30px; font-size: 1.1em; color: #FF4081; font-weight: bold;">
+            Você é o Amor da Minha Vida. Te amo amor!❤️
+        </p>
+
+
+    </div>
+
+</div>
+
+<script>
+    // Configurações e Dados
+    const START_DATE = new Date('2025-07-19T00:00:00').getTime(); // Data de Início do "Namoro"
+    const QUIZ_CLICKS_REQUIRED = 10; // Número de cliques necessários para 100% no Love Meter
+    let currentLoveClicks = 0; // Contador de cliques do Love Meter
+    
+    const QUESTIONS = [
+        // Q1 (Index 0): O que o Juninho mais ama em você? (Correta: A - 0)
+        {
+            q: "O que o Juninho mais ama em você?",
+            options: ["Seu sorriso", "Seu jeito", "Seus seios", "Seu olhar"],
+            correctIndex: 0 
+        },
+        // Q2 (Index 1): Primeiro presente (Correta: C - 2)
+        {
+            q: "Qual foi o primeiro presente que você deu para o Junior?",
+            options: ["Uma flor", "Uma barra de chocolate", "Uma caixa de bombom", "Uma cesta de namoro"],
+            correctIndex: 2 
+        },
+        // Q3 (Index 2): Primeira ficada (Correta: B - 1)
+        {
+            q: "O que a gente assistiu juntos na primeira ficada?",
+            options: ["Jovens Titans", "Gumball", "Stranger Things", "Bob Esponja"],
+            correctIndex: 1 
+        },
+        // Q4 (Index 3): Coisa que você faz que o Juninho adora (Todas corretas!)
+        {
+            q: "Uma coisa que você faz que o Juninho adora?",
+            options: ["Quando você ri muito", "Quando é engraçada", "Quando passa o nariz no dele", "Quando faz voz de neném"],
+            // A lógica de "todas corretas" está no checkAnswer. O correctIndex aqui é apenas um fallback
+            correctIndex: 0 
+        },
+        // Q5 (Index 4): O que o Junior ama fazer em você (Todas corretas!)
+        {
+            q: "O que o Junior ama fazer em você?",
+            options: ["Chupar sua bct", "Fazer carinho", "Sentir sua respiração cheirosa", "Acariciar seus peitões"],
+            // A lógica de "todas corretas" está no checkAnswer. O correctIndex aqui é apenas um fallback
+            correctIndex: 0 
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    const QUIZ_CONTAINER = document.getElementById('quiz-content');
+    const NO_BUTTON_ID = 'no-button';
+    let fleeHandler = null; // Handler global para a função de fuga
+
+    // --- Funções de Navegação e Seções ---
+
+    function startLoveMeter() {
+        document.getElementById('intro-section').style.display = 'none';
+        document.getElementById('love-meter-section').style.display = 'block';
+        
+        // INICIA A MÚSICA APÓS O PRIMEIRO CLIQUE 
+        const music = document.getElementById('background-music');
+        music.play().catch(error => {
+            console.log("Erro ao tentar tocar música automaticamente. (Pode ser que o navegador bloqueie antes do clique)");
+        });
+
+        // Atualiza o texto inicial do Love Meter
+        updateLoveMeter();
+    }
+    
+    function updateLoveMeter() {
+        const loveBar = document.getElementById('love-bar');
+        const loveText = document.getElementById('love-text');
+        
+        // Calcula a porcentagem
+        const percentage = Math.min(100, Math.round((currentLoveClicks / QUIZ_CLICKS_REQUIRED) * 100));
+        
+        loveBar.style.width = `${percentage}%`;
+        loveBar.textContent = `${percentage}%`;
+        loveText.textContent = `${currentLoveClicks}/${QUIZ_CLICKS_REQUIRED} cliques. (Você precisa de 100%!)`;
+
+        if (percentage >= 100) {
+            loveText.textContent = '100%! Nível de Namoro Oficial atingido!';
+            // Desativa os botões do Love Meter para evitar cliques extras
+            document.getElementById('full-heart-button').style.pointerEvents = 'none';
+            // Vai para o Quiz após o Love Meter
+            setTimeout(startQuiz, 1500); 
+        }
+    }
+
+    // Função de clique interativo do Love Meter
+    function handleLoveClick(isPositive) {
+        if (currentLoveClicks >= QUIZ_CLICKS_REQUIRED) return; // Já está 100%
+
+        if (isPositive) {
+            currentLoveClicks++;
+        } else {
+            // O botão partido pode dar uma mensagem ou, como no vídeo, ser neutro/decorativo. 
+            // Aqui, ele será neutro.
+            const messageBox = document.createElement('div');
+            messageBox.textContent = "Só o coração completo conta! 😉";
+            messageBox.style.cssText = "position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #f44336; color: white; padding: 10px 20px; border-radius: 8px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.2);";
+            document.body.appendChild(messageBox);
+            setTimeout(() => { document.body.removeChild(messageBox); }, 1500);
+        }
+
+        updateLoveMeter();
+    }
+
+
+    function startQuiz() {
+        document.getElementById('love-meter-section').style.display = 'none';
+        document.getElementById('quiz-section').style.display = 'block';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentQuestionIndex >= QUESTIONS.length) {
+            // Fim do Quiz -> Vai para a seção de Proposta (Texto + Pergunta)
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('quiz-message').textContent = 'Parabéns! Você respondeu tudo certo!'; // Adiciona a mensagem de sucesso
+            document.getElementById('quiz-message').style.display = 'block';
+            setTimeout(startProposalOnly, 7000); 
+            return;
+        }
+
+        const qData = QUESTIONS[currentQuestionIndex];
+        let html = `<div class="question" id="q${currentQuestionIndex + 1}">
+                        <h2>${qData.q}</h2>
+                        <div class="options-grid">`;
+        
+        qData.options.forEach((option, index) => {
+            html += `<div class="option" data-index="${index}" onclick="checkAnswer(this, ${qData.correctIndex})">${option}</div>`;
+        });
+
+        html += `</div></div>`;
+        
+        QUIZ_CONTAINER.innerHTML = html;
+    }
+
+    function checkAnswer(selectedOption, correctIndex) {
+        const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+        const options = selectedOption.closest('.question').querySelectorAll('.option'); // Apenas as opções da pergunta atual
+        
+        // Desativa cliques temporariamente
+        options.forEach(opt => opt.style.pointerEvents = 'none');
+        
+        // Lógica Especial para Q4 (Index 3) e Q5 (Index 4) - Todas as respostas são corretas
+        const isAllCorrectQuestion = (currentQuestionIndex === 3 || currentQuestionIndex === 4);
+
+        if (isAllCorrectQuestion || selectedIndex === correctIndex) {
+            // Resposta correta ou em questão "todas corretas"
+            selectedOption.classList.add('correct');
+            currentQuestionIndex++;
+            setTimeout(loadQuestion, 1500); 
+        } else {
+            // Resposta incorreta 
+            selectedOption.classList.add('incorrect');
+            
+            // Exibe caixa de mensagem de erro temporária (sem revelar a correta)
+            const messageBox = document.createElement('div');
+            messageBox.textContent = "Quen Quen Quen Quen Ops! Resposta incorreta burrona! Pense na NOSSA história. E tente de novo!";
+            messageBox.style.cssText = "position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #ff4081; color: white; padding: 10px 20px; border-radius: 8px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.2);";
+            document.body.appendChild(messageBox);
+
+            setTimeout(() => {
+                document.body.removeChild(messageBox);
+                
+                // Remove a marcação de erro e reativa os cliques para tentar novamente
+                selectedOption.classList.remove('incorrect');
+                options.forEach(opt => opt.style.pointerEvents = 'auto');
+            }, 6000); // 6 segundos para ler a mensagem e tentar de novo
+        }
+    }
+
+    function startProposalOnly() {
+        document.getElementById('quiz-section').style.display = 'none';
+        document.getElementById('proposal-only').style.display = 'block';
+        setupNoButtonMover(); // Inicia o botão NÃO (agora ao lado do SIM)
+    }
+    
+    // --- Lógica do Botão 'Não' que se move ---
+
+    function setupNoButtonMover() {
+        const noButton = document.getElementById(NO_BUTTON_ID);
+        // O botão aparece na posição normal, ao lado do SIM
+        noButton.style.display = 'block'; 
+
+        // Adiciona listeners para iniciar a fuga quando o mouse/toque chegar perto
+        noButton.addEventListener('mouseover', startFleeing);
+        noButton.addEventListener('touchstart', startFleeing);
+    }
+
+    // Função que converte o botão de fluxo normal para fixed e ativa o mover global
+    function startFleeing(e) {
+        const noButton = document.getElementById(NO_BUTTON_ID);
+        
+        // 1. Remove os listeners de 'mouseover' e 'touchstart' do próprio botão
+        noButton.removeEventListener('mouseover', startFleeing);
+        noButton.removeEventListener('touchstart', startFleeing);
+
+        // 2. Captura a posição atual e muda para fixed
+        const btnRect = noButton.getBoundingClientRect();
+        noButton.style.position = 'fixed';
+        noButton.style.left = `${btnRect.left}px`;
+        noButton.style.top = `${btnRect.top}px`;
+        noButton.style.margin = '0'; // Limpa margens para não interferir
+
+        // 3. Ativa o listener global de movimento que faz o botão fugir
+        fleeHandler = (moveEvent) => {
+            // Usa a função de movimento (agora ela assume que o botão é fixed)
+            moveNoButton(moveEvent);
+        };
+        
+        document.addEventListener('mousemove', fleeHandler);
+        
+        // Adiciona fallback para o touch (celulares)
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault(); 
+            if (e.touches.length > 0) {
+                fleeHandler(e); // Chama o mesmo handler
+            }
+        }, { passive: false });
+        
+        // Simula a primeira fuga imediatamente se for um evento que tem coordenadas (como mouseover)
+        if (e.clientX || e.touches) {
+            moveNoButton(e); 
+        }
+    }
+
+    // Função que move o botão para uma posição aleatória longe do mouse/toque
+    const moveNoButton = (e) => {
+        const noButton = document.getElementById(NO_BUTTON_ID);
+        
+        // Se for evento de toque, extrai as coordenadas
+        const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : undefined);
+        const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : undefined);
+
+        if (clientX === undefined || clientY === undefined) return;
+
+        // Usar as coordenadas atuais do botão (já em modo fixed)
+        const btnRect = noButton.getBoundingClientRect(); 
+
+        // Posição central do botão na tela
+        const btnCenterX = btnRect.left + (btnRect.width / 2);
+        const btnCenterY = btnRect.top + (btnRect.height / 2);
+
+        // Distância do mouse/toque para o centro do botão
+        const distanceX = clientX - btnCenterX;
+        const distanceY = clientY - btnCenterY;
+        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+        // Se o mouse/toque estiver muito perto (ex: 150px), o botão foge
+        if (distance < 150) { 
+            let newX, newY;
+            
+            // 1. Pega as dimensões da janela
+            const maxX = window.innerWidth - btnRect.width;
+            const maxY = window.innerHeight - btnRect.height;
+            
+            // 2. Define um novo ponto aleatório longe do mouse
+            let attempts = 0;
+            do {
+                // Gera um ponto aleatório na tela
+                newX = Math.random() * maxX;
+                newY = Math.random() * maxY;
+                
+                // Calcula a distância do novo ponto para o mouse/toque
+                const newDist = Math.sqrt(
+                    (clientX - (newX + btnRect.width / 2)) ** 2 + 
+                    (clientY - (newY + btnRect.height / 2)) ** 2
+                );
+
+                attempts++;
+                // Tentamos garantir que o novo ponto esteja pelo menos a 150px do mouse.
+                if (newDist > 150 || attempts > 5) break; 
+            } while (true);
+
+            // Aplica as novas coordenadas (usando left/top)
+            noButton.style.left = `${newX}px`;
+            noButton.style.top = `${newY}px`;
+        }
+    };
+    
+    // --- Lógica do Aceite (Sim) ---
+
+    function acceptProposal() {
+        // Remove o botão NÃO da tela e para a lógica de fuga
+        const noButton = document.getElementById(NO_BUTTON_ID);
+        noButton.style.display = 'none';
+
+        // Remove listeners de fuga, se estiverem ativos
+        if (fleeHandler) {
+            document.removeEventListener('mousemove', fleeHandler);
+            // Embora remover o touchmove seja mais complexo, o display: none é suficiente.
+        }
+
+        // Esconde a seção da proposta
+        document.getElementById('proposal-only').style.display = 'none';
+        
+        // Mostra a seção de Aceite (Contador + Fotos)
+        document.getElementById('accepted-section').style.display = 'block';
+
+        // Atualiza a mensagem na tela
+        document.getElementById('accepted-section').querySelector('h1').textContent = "SIM!!! EU TE AMO! Agora somos OFICIAIS! ❤️";
+        
+        // Inicia o contador de tempo
+        setInterval(updateCountdown, 1000); 
+
+        // Tenta iniciar a música novamente 
+        const music = document.getElementById('background-music');
+        music.play().catch(error => {
+            console.log("Erro ao tentar tocar música automaticamente na aceitação.");
+        }); 
+        
+        // Garante que a galeria fique na primeira foto (scrollLeft = 0)
+        const gallery = document.getElementById('photo-gallery');
+        gallery.scrollLeft = 0;
+    }
+    
+    // --- Lógica do Contador de Tempo ---
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = now - START_DATE;
+
+        const totalSeconds = Math.floor(distance / 1000);
+        const totalMinutes = Math.floor(totalSeconds / 60);
+        const totalHours = Math.floor(totalMinutes / 60);
+        const totalDays = Math.floor(totalHours / 24);
+
+        const days = totalDays;
+        const hours = totalHours % 24;
+        const minutes = totalMinutes % 60;
+        const seconds = totalSeconds % 60;
+
+        document.getElementById('days').textContent = String(days).padStart(2, '0');
+        document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+    }
+    
+    // --- NOVO: Lógica de Scroll da Galeria (para Desktop) ---
+    function scrollGallery(direction) {
+        const gallery = document.getElementById('photo-gallery');
+        // Usamos 85% da largura visível do container para um bom salto
+        const scrollAmount = gallery.clientWidth * 0.85; 
+
+        gallery.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+
+</script>
+
+</body>
+</html>
+
